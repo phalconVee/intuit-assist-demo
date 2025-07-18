@@ -630,9 +630,7 @@ I've automatically filled out your Schedule D form below. You can review all the
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-            <div className="w-4 h-4 bg-white rounded-full"></div>
-          </div>
+          <img src="/intuit-icon-60x60.png" alt="Intuit Icon" className="w-6 h-6 rounded-full" />
           <div>
             <span className="text-lg font-semibold text-gray-800">Intuit Assist</span>
             <p className="text-xs text-gray-600">Context-aware tax help</p>
