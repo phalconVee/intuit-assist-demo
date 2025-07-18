@@ -1,0 +1,22 @@
+symbol,type,action,date,quantity,price,fees,description
+AAPL,stock,buy,2023-01-15,100,150.25,9.99,Apple Inc - Initial Purchase
+AAPL,stock,buy,2023-03-20,50,145.80,9.99,Apple Inc - Additional Shares
+AAPL,stock,sell,2023-08-10,75,185.40,9.99,Apple Inc - Partial Sale
+TSLA,stock,buy,2023-02-05,25,200.50,9.99,Tesla Inc - Growth Investment
+TSLA,stock,sell,2023-11-22,25,240.75,9.99,Tesla Inc - Full Position Sale
+MSFT,stock,buy,2022-11-15,80,245.30,9.99,Microsoft Corp - Long Term Hold
+MSFT,stock,sell,2023-09-18,40,335.60,9.99,Microsoft Corp - Profit Taking
+GOOGL,stock,buy,2023-01-30,15,95.20,9.99,Alphabet Inc - Tech Diversification
+GOOGL,stock,buy,2023-05-12,10,110.45,9.99,Alphabet Inc - Dollar Cost Average
+AMZN,stock,buy,2023-04-08,20,105.75,9.99,Amazon Inc - E-commerce Play
+AMZN,stock,sell,2023-10-15,20,135.20,9.99,Amazon Inc - Position Close
+NVDA,stock,buy,2023-06-01,12,380.50,9.99,NVIDIA Corp - AI Investment
+NVDA,stock,sell,2023-12-05,6,495.80,9.99,NVIDIA Corp - Partial Profit
+BTC,crypto,buy,2023-01-10,0.5,20000,25,Bitcoin - Crypto Allocation
+BTC,crypto,sell,2023-07-20,0.25,30000,30,Bitcoin - Partial Sale
+ETH,crypto,buy,2023-02-14,2,1500,20,Ethereum - Smart Contract Exposure
+ETH,crypto,sell,2023-09-30,1,1650,25,Ethereum - Rebalancing
+SPY,stock,buy,2023-03-01,50,390.25,9.99,SPDR S&P 500 ETF - Index Fund
+VTI,stock,buy,2023-04-15,30,210.80,9.99,Vanguard Total Stock Market ETF
+QQQ,stock,buy,2023-05-20,25,350.40,9.99,Invesco QQQ Trust - Tech ETF
+QQQ,stock,sell,2023-11-10,10,385.90,9.99,Invesco QQQ Trust - Profit Taking
