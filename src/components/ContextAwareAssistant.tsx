@@ -67,7 +67,7 @@ export const ContextAwareAssistant: React.FC<ContextAwareAssistantProps> = ({ is
   }>>([]);
   const chatContainerRef = React.useRef<HTMLDivElement>(null);
 
-  // Inactivity detection
+  // Inactivity detection - less aggressive
   useEffect(() => {
     const resetInactivityTimer = () => {
       setLastActivityTime(new Date());
@@ -78,7 +78,7 @@ export const ContextAwareAssistant: React.FC<ContextAwareAssistantProps> = ({ is
 
       const timer = setTimeout(() => {
         showInactivityPrompt();
-      }, 20000); // 20 seconds
+      }, 120000); // Increased to 2 minutes
 
       setInactivityTimer(timer);
     };
@@ -115,8 +115,25 @@ export const ContextAwareAssistant: React.FC<ContextAwareAssistantProps> = ({ is
       return;
     }
     
-    // Don't show if we've shown a prompt in the last 2 minutes
-    if (lastInactivityPromptTime && (now.getTime() - lastInactivityPromptTime.getTime()) < 120000) {
+    // Don't show if we've shown a prompt in the last 10 minutes (increased from 5 minutes)
+    if (lastInactivityPromptTime && (now.getTime() - lastInactivityPromptTime.getTime()) < 600000) {
+      return;
+    }
+
+    // Don't show if chat has more than 3 messages already (reduced from 5)
+    if (chatMessages.length > 3) {
+      return;
+    }
+
+    // Don't show if user has been active in the last 2 minutes
+    const timeSinceLastActivity = now.getTime() - lastActivityTime.getTime();
+    if (timeSinceLastActivity < 120000) { // 2 minutes
+      return;
+    }
+
+    // Only show on specific screens where help is most needed
+    const screensThatNeedHelp = ['income', 'deductions', 'investments'];
+    if (!screensThatNeedHelp.includes(currentScreen)) {
       return;
     }
 
@@ -222,66 +239,19 @@ export const ContextAwareAssistant: React.FC<ContextAwareAssistantProps> = ({ is
       prev.map(p => p.id === promptId ? { ...p, responded: true } : p)
     );
 
-    // Clear old inactivity prompts from chat to reduce clutter
+    // Simply remove the inactivity prompt from chat without adding more messages
     setChatMessages(prev => 
-      prev.filter(msg => msg.type !== 'inactivity-prompt' || msg.promptId === promptId)
+      prev.filter(msg => msg.type !== 'inactivity-prompt' || msg.promptId !== promptId)
     );
 
-    // Add response message
-    const responseMessage = needsHelp 
-      ? "Great! I'm here to help. What specific question do you have about this section?"
-      : "No problem! I'll be here if you need me. Just continue at your own pace.";
-
-    setChatMessages(prev => [...prev, {
-      id: `msg-${Date.now()}`,
-      message: responseMessage,
-      isUser: false,
-      timestamp: new Date()
-    }]);
-
-    // Auto-scroll to the response
-    setTimeout(() => {
-      if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTo({
-          top: chatContainerRef.current.scrollHeight,
-          behavior: 'smooth'
-        });
-      }
-    }, 100);
-
+    // Only add a simple response if user needs help, and keep it brief
     if (needsHelp) {
-      // Show relevant suggestions for the current screen
-      const contextualHelp = getContextualHelp();
-      if (contextualHelp) {
-        setTimeout(() => {
-          setChatMessages(prev => [...prev, {
-            id: `msg-${Date.now() + 1}`,
-            message: contextualHelp,
-            isUser: false,
-            timestamp: new Date()
-          }]);
-          
-          // Auto-scroll to contextual help
-          setTimeout(() => {
-            if (chatContainerRef.current) {
-              chatContainerRef.current.scrollTo({
-                top: chatContainerRef.current.scrollHeight,
-                behavior: 'smooth'
-              });
-            }
-          }, 600);
-          
-          // Auto-scroll to the new message after a brief delay
-          setTimeout(() => {
-            if (chatContainerRef.current) {
-              chatContainerRef.current.scrollTo({
-                top: chatContainerRef.current.scrollHeight,
-                behavior: 'smooth'
-              });
-            }
-          }, 100);
-        }, 500);
-      }
+      setChatMessages(prev => [...prev, {
+        id: `msg-${Date.now()}`,
+        message: "I'm here to help! What would you like to know?",
+        isUser: false,
+        timestamp: new Date()
+      }]);
     }
   };
 
@@ -302,10 +272,14 @@ export const ContextAwareAssistant: React.FC<ContextAwareAssistantProps> = ({ is
   const generateSuggestions = (): AssistantSuggestion[] => {
     const suggestions: AssistantSuggestion[] = [];
 
+    // Only show 1-2 high-priority suggestions per screen to reduce clutter
+    let suggestionCount = 0;
+    const maxSuggestions = 2;
+
     // Screen-specific suggestions
     switch (currentScreen) {
       case 'income':
-        if (taxData.income.rsus.hasRSUs) {
+        if (taxData.income.rsus.hasRSUs && suggestionCount < maxSuggestions) {
           suggestions.push({
             id: 'rsu-calculation',
             type: 'calculation',
@@ -315,21 +289,10 @@ export const ContextAwareAssistant: React.FC<ContextAwareAssistantProps> = ({ is
             priority: 'high',
             icon: TrendingUp
           });
+          suggestionCount++;
         }
 
-        if (taxData.income.freelanceIncome > 0) {
-          suggestions.push({
-            id: 'schedule-c-reminder',
-            type: 'reminder',
-            title: 'Schedule C Required',
-            message: `With $${taxData.income.freelanceIncome.toLocaleString()} in freelance income, you'll need Schedule C. I can help you maximize business deductions.`,
-            action: 'Review business expenses',
-            priority: 'medium',
-            icon: FileText
-          });
-        }
-
-        if (taxData.income.cryptoGains > 0) {
+        if (taxData.income.cryptoGains > 0 && suggestionCount < maxSuggestions) {
           suggestions.push({
             id: 'crypto-reporting',
             type: 'warning',
@@ -339,22 +302,37 @@ export const ContextAwareAssistant: React.FC<ContextAwareAssistantProps> = ({ is
             priority: 'high',
             icon: AlertCircle
           });
+          suggestionCount++;
         }
 
-        // Add investment transaction upload suggestion
-        suggestions.push({
-          id: 'upload-transactions',
-          type: 'calculation',
-          title: 'Upload Investment Statements',
-          message: 'Upload your brokerage statements to automatically calculate capital gains and populate Schedule D.',
-          action: 'Upload transactions',
-          priority: 'medium',
-          icon: Upload
-        });
+        // Only add upload suggestion if no other suggestions
+        if (suggestionCount === 0) {
+          suggestions.push({
+            id: 'upload-transactions',
+            type: 'calculation',
+            title: 'Upload Investment Statements',
+            message: 'Upload your brokerage statements to automatically calculate capital gains and populate Schedule D.',
+            action: 'Upload transactions',
+            priority: 'medium',
+            icon: Upload
+          });
+        }
         break;
 
       case 'deductions':
-        if (taxData.deductions.homeOfficeDeduction && taxData.income.freelanceIncome > 0) {
+        if (taxData.deductions.stateLocalTaxes >= 10000 && suggestionCount < maxSuggestions) {
+          suggestions.push({
+            id: 'salt-cap-warning',
+            type: 'warning',
+            title: 'SALT Deduction Cap',
+            message: 'Your state and local taxes hit the $10,000 cap. Consider tax planning strategies for next year.',
+            priority: 'medium',
+            icon: AlertCircle
+          });
+          suggestionCount++;
+        }
+
+        if (taxData.deductions.homeOfficeDeduction && taxData.income.freelanceIncome > 0 && suggestionCount < maxSuggestions) {
           suggestions.push({
             id: 'home-office-optimization',
             type: 'optimization',
@@ -364,34 +342,12 @@ export const ContextAwareAssistant: React.FC<ContextAwareAssistantProps> = ({ is
             priority: 'medium',
             icon: Home
           });
-        }
-
-        if (taxData.deductions.stateLocalTaxes >= 10000) {
-          suggestions.push({
-            id: 'salt-cap-warning',
-            type: 'warning',
-            title: 'SALT Deduction Cap',
-            message: 'Your state and local taxes hit the $10,000 cap. Consider tax planning strategies for next year.',
-            priority: 'medium',
-            icon: AlertCircle
-          });
-        }
-
-        if (taxData.deductions.charitableDonations > 0) {
-          suggestions.push({
-            id: 'charitable-optimization',
-            type: 'optimization',
-            title: 'Charitable Giving Strategy',
-            message: `With $${taxData.deductions.charitableDonations.toLocaleString()} in donations, consider bunching strategies or donor-advised funds.`,
-            action: 'Explore giving strategies',
-            priority: 'low',
-            icon: CheckCircle
-          });
+          suggestionCount++;
         }
         break;
 
       case 'investments':
-        if (taxData.investments.retirementContributions.traditional401k < 22500) {
+        if (taxData.investments.retirementContributions.traditional401k < 22500 && suggestionCount < maxSuggestions) {
           const remaining = 22500 - taxData.investments.retirementContributions.traditional401k;
           suggestions.push({
             id: 'retirement-contribution',
@@ -402,24 +358,13 @@ export const ContextAwareAssistant: React.FC<ContextAwareAssistantProps> = ({ is
             priority: 'high',
             icon: TrendingUp
           });
-        }
-
-        if (taxData.investments.hsa.contributions < 3850) {
-          suggestions.push({
-            id: 'hsa-contribution',
-            type: 'optimization',
-            title: 'HSA Contribution Opportunity',
-            message: 'HSA contributions are triple tax-advantaged. Consider maximizing your contribution.',
-            action: 'Review HSA benefits',
-            priority: 'medium',
-            icon: DollarSign
-          });
+          suggestionCount++;
         }
         break;
     }
 
-    // Activity-based suggestions
-    if (userActivity.pauseDetected) {
+    // Only show activity-based suggestions if no other suggestions and user has been inactive
+    if (userActivity.pauseDetected && suggestions.length === 0) {
       suggestions.push({
         id: 'pause-help',
         type: 'question',
@@ -427,19 +372,6 @@ export const ContextAwareAssistant: React.FC<ContextAwareAssistantProps> = ({ is
         message: `You've been on the ${currentScreen} section for a while. Is there something specific I can help you with?`,
         priority: 'medium',
         icon: Clock
-      });
-    }
-
-    // General optimization suggestions
-    if (taxData.income.w2Income > 100000 && !taxData.flags.hasComplexInvestments) {
-      suggestions.push({
-        id: 'tax-planning',
-        type: 'optimization',
-        title: 'Tax Planning Opportunity',
-        message: 'With your income level, consider advanced tax strategies like backdoor Roth conversions.',
-        action: 'Learn about tax strategies',
-        priority: 'low',
-        icon: Brain
       });
     }
 
@@ -472,9 +404,10 @@ I've automatically filled out your Schedule D form below. You can review all the
       timestamp: new Date()
     }]);
   };
+  // Only update suggestions when screen changes, not on every tax data change
   useEffect(() => {
     setSuggestions(generateSuggestions());
-  }, [currentScreen, taxData, userActivity.pauseDetected]);
+  }, [currentScreen]); // Removed taxData and userActivity.pauseDetected to reduce frequency
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -525,11 +458,11 @@ I've automatically filled out your Schedule D form below. You can review all the
     setChatInput('');
   };
 
-  // Clean up old chat messages periodically to prevent clutter
+  // Clean up old chat messages more frequently to prevent clutter
   useEffect(() => {
     const cleanupInterval = setInterval(() => {
       setChatMessages(prev => {
-        // Keep only the last 10 messages and remove old unanswered inactivity prompts
+        // Keep only the last 6 messages and remove old unanswered inactivity prompts
         const filtered = prev.filter(msg => {
           if (msg.type === 'inactivity-prompt') {
             const prompt = inactivityPrompts.find(p => p.id === msg.promptId);
@@ -538,10 +471,10 @@ I've automatically filled out your Schedule D form below. You can review all the
           return true;
         });
         
-        // Keep only the most recent 10 messages
-        return filtered.slice(-10);
+        // Keep only the most recent 4 messages (reduced from 6)
+        return filtered.slice(-4);
       });
-    }, 60000); // Clean up every minute
+    }, 30000); // Clean up every 30 seconds (reduced from 60 seconds)
 
     return () => clearInterval(cleanupInterval);
   }, [inactivityPrompts]);
