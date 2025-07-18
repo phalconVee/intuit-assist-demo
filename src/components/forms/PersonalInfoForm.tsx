@@ -48,22 +48,22 @@ export const PersonalInfoForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
+    <div className="max-w-4xl mx-auto p-4 lg:p-8">
       <div className="bg-white rounded-xl shadow-lg border border-gray-200">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-gray-200 rounded-t-xl">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 lg:p-6 border-b border-gray-200 rounded-t-xl">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <User className="w-6 h-6 text-white" />
+            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <User className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
-              <p className="text-gray-600">Tell us about yourself and your filing status</p>
+              <h2 className="text-xl lg:text-2xl font-bold text-gray-900">Personal Information</h2>
+              <p className="text-sm lg:text-base text-gray-600">Tell us about yourself and your filing status</p>
             </div>
           </div>
         </div>
 
-        <div className="p-8 space-y-8">
+        <div className="p-4 lg:p-8 space-y-6 lg:space-y-8">
           {/* Basic Information */}
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -71,7 +71,7 @@ export const PersonalInfoForm: React.FC = () => {
               Basic Information
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Full Legal Name *

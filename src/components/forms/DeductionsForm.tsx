@@ -28,23 +28,23 @@ export const DeductionsForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-8">
+    <div className="max-w-6xl mx-auto p-4 lg:p-8">
       <div className="bg-white rounded-xl shadow-lg border border-gray-200">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 border-b border-gray-200 rounded-t-xl">
-          <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 lg:p-6 border-b border-gray-200 rounded-t-xl">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
-                <Receipt className="w-6 h-6 text-white" />
+              <div className="w-8 h-8 lg:w-10 lg:h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                <Receipt className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Deductions & Credits</h2>
-                <p className="text-gray-600">Maximize your tax savings with deductions and credits</p>
+                <h2 className="text-xl lg:text-2xl font-bold text-gray-900">Deductions & Credits</h2>
+                <p className="text-sm lg:text-base text-gray-600">Maximize your tax savings with deductions and credits</p>
               </div>
             </div>
-            <div className="text-right">
+            <div className="text-left lg:text-right">
               <div className="text-sm text-gray-600">Recommended</div>
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-xl lg:text-2xl font-bold text-purple-600">
                 {totalItemized > standardDeduction ? 'Itemize' : 'Standard'}
               </div>
               <div className="text-sm text-gray-600">
@@ -54,12 +54,12 @@ export const DeductionsForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-8">
+        <div className="p-4 lg:p-8">
           {/* Deduction Type Selection */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Your Deduction Method</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div
                 className={`border rounded-lg p-6 cursor-pointer transition-all ${
                   deductionType === 'standard'
@@ -120,13 +120,13 @@ export const DeductionsForm: React.FC = () => {
           {deductionType === 'itemized' && (
             <div className="space-y-8">
               {/* Home & Mortgage */}
-              <div className="bg-blue-50 p-6 rounded-lg">
+              <div className="bg-blue-50 p-4 lg:p-6 rounded-lg">
                 <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                   <Home className="w-5 h-5 mr-2 text-blue-600" />
                   Home & Mortgage
                 </h4>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Mortgage Interest
@@ -186,13 +186,13 @@ export const DeductionsForm: React.FC = () => {
               </div>
 
               {/* Charitable Giving */}
-              <div className="bg-green-50 p-6 rounded-lg">
+              <div className="bg-green-50 p-4 lg:p-6 rounded-lg">
                 <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                   <Heart className="w-5 h-5 mr-2 text-green-600" />
                   Charitable Giving
                 </h4>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Cash Donations
@@ -222,10 +222,10 @@ export const DeductionsForm: React.FC = () => {
               </div>
 
               {/* Medical & Other */}
-              <div className="bg-red-50 p-6 rounded-lg">
+              <div className="bg-red-50 p-4 lg:p-6 rounded-lg">
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Medical & Other Deductions</h4>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Medical Expenses

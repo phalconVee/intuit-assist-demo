@@ -13,7 +13,8 @@ import {
   X,
   Upload,
   BarChart3,
-  HelpCircle
+  HelpCircle,
+  Brain
 } from 'lucide-react';
 import { useTaxData } from '../contexts/TaxDataContext';
 import { TransactionUploader } from './TransactionUploader';
@@ -104,7 +105,7 @@ export const ContextAwareAssistant: React.FC<ContextAwareAssistantProps> = ({ is
       document.removeEventListener('scroll', handleUserActivity);
       document.removeEventListener('touchstart', handleUserActivity);
     };
-  }, [inactivityTimer]);
+  }, []); // Remove inactivityTimer from dependencies
 
   const showInactivityPrompt = () => {
     const now = new Date();
